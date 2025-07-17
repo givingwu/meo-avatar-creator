@@ -13,9 +13,9 @@ import { CustomerService } from "@/components/CustomerService";
 import { useToast } from "@/hooks/use-toast";
 
 interface FormData {
+  orderNumber: string;
   name: string;
   phone: string;
-  address: string;
   personality: string;
   voiceBlob: Blob | null;
   avatarUrl: string | null;
@@ -28,9 +28,9 @@ interface UploadMaterialsProps {
 
 export const UploadMaterials = ({ onNext, onBack }: UploadMaterialsProps) => {
   const [formData, setFormData] = useState<FormData>({
+    orderNumber: '',
     name: '',
     phone: '',
-    address: '',
     personality: '',
     voiceBlob: null,
     avatarUrl: null,
@@ -55,10 +55,8 @@ export const UploadMaterials = ({ onNext, onBack }: UploadMaterialsProps) => {
   const validateForm = () => {
     const errors = [];
     
-    if (!formData.name.trim()) errors.push("姓名");
-    if (!formData.phone.trim()) errors.push("手机号码");
-    else if (!validatePhone(formData.phone)) errors.push("手机号码格式");
-    if (!formData.address.trim()) errors.push("地址");
+    if (!formData.orderNumber.trim()) errors.push("订单号");
+    if (formData.phone.trim() && !validatePhone(formData.phone)) errors.push("手机号码格式");
     if (!formData.personality.trim()) errors.push("性格描述");
     if (!formData.voiceBlob) errors.push("声音素材");
     if (!formData.avatarUrl) errors.push("头像素材");
@@ -108,21 +106,34 @@ export const UploadMaterials = ({ onNext, onBack }: UploadMaterialsProps) => {
         <div className="bg-card rounded-xl shadow-soft p-6 space-y-6">
           <div className="grid gap-6">
             <div className="space-y-2">
+              <Label htmlFor="orderNumber" className="text-sm font-medium">
+                订单号*
+              </Label>
+              <Input
+                id="orderNumber"
+                value={formData.orderNumber}
+                onChange={(e) => setFormData(prev => ({ ...prev, orderNumber: e.target.value }))}
+                placeholder="请输入订单号"
+                className="transition-all duration-200 focus:shadow-soft"
+              />
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="name" className="text-sm font-medium">
-                姓名* <span className="text-xs text-muted-foreground">（请与下单信息一致）</span>
+                收件人姓名 <span className="text-xs text-muted-foreground">（可提供收件人信息，若定制过程中有声音和头像上的疑问，客服会据此信息联系您）</span>
               </Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="请输入您的姓名"
+                placeholder="请输入收件人姓名"
                 className="transition-all duration-200 focus:shadow-soft"
               />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="phone" className="text-sm font-medium">
-                手机号码* <span className="text-xs text-muted-foreground">（请与下单信息一致）</span>
+                收件手机号码 <span className="text-xs text-muted-foreground">（可提供收件人信息，若定制过程中有声音和头像上的疑问，客服会据此信息联系您）</span>
               </Label>
               <Input
                 id="phone"
@@ -130,19 +141,6 @@ export const UploadMaterials = ({ onNext, onBack }: UploadMaterialsProps) => {
                 onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
                 placeholder="请输入11位手机号码"
                 maxLength={11}
-                className="transition-all duration-200 focus:shadow-soft"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="address" className="text-sm font-medium">
-                地址* <span className="text-xs text-muted-foreground">（请与下单信息一致）</span>
-              </Label>
-              <Input
-                id="address"
-                value={formData.address}
-                onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
-                placeholder="请输入收货地址"
                 className="transition-all duration-200 focus:shadow-soft"
               />
             </div>
@@ -243,7 +241,7 @@ export const UploadMaterials = ({ onNext, onBack }: UploadMaterialsProps) => {
 
           <div className="pt-6 border-t border-border/50">
             <p className="text-xs text-muted-foreground mb-4 text-center">
-              注释：获取的姓名、电话和地址仅为配送使用，不涉及获取个人隐私
+              注释：获取的姓名、电话仅为定制过程中沟通使用，不涉及获取个人隐私
             </p>
             
             <div className="space-y-3">
