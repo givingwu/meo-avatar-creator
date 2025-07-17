@@ -5,11 +5,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { uploadPhotoAndGenerateAvatar } from "@/lib/api";
 
 interface AvatarGeneratorProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (imageUrl: string) => void;
+  onSave: (imageUrl: string, originalPhotoUrl?: string) => void;
 }
 
 interface GeneratedImage {
@@ -21,6 +22,8 @@ interface GeneratedImage {
 export const AvatarGenerator = ({ isOpen, onClose, onSave }: AvatarGeneratorProps) => {
   const [selectedGender, setSelectedGender] = useState<'male' | 'female'>('male');
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [originalPhotoUrl, setOriginalPhotoUrl] = useState<string | null>(null);
   const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -39,19 +42,32 @@ export const AvatarGenerator = ({ isOpen, onClose, onSave }: AvatarGeneratorProp
     { id: '8', url: '/placeholder.svg', style: 'realistic' },
   ];
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      setUploadedFile(file);
       const reader = new FileReader();
       reader.onload = (e) => {
         setUploadedImage(e.target?.result as string);
       };
       reader.readAsDataURL(file);
       
-      toast({
-        title: "图片上传成功",
-        description: "您现在可以生成AI头像了",
-      });
+      try {
+        const response = await uploadPhotoAndGenerateAvatar(file);
+        if (response.code === 200) {
+          setOriginalPhotoUrl(response.data.url);
+          toast({
+            title: "图片上传成功",
+            description: "您现在可以生成AI头像了",
+          });
+        }
+      } catch (error) {
+        toast({
+          title: "上传失败",
+          description: "图片上传出现错误，请重试",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -80,13 +96,15 @@ export const AvatarGenerator = ({ isOpen, onClose, onSave }: AvatarGeneratorProp
 
   const deleteUploadedImage = () => {
     setUploadedImage(null);
+    setUploadedFile(null);
+    setOriginalPhotoUrl(null);
     setGeneratedImages([]);
     setSelectedImage(null);
   };
 
   const handleConfirm = () => {
     if (selectedImage) {
-      onSave(selectedImage);
+      onSave(selectedImage, originalPhotoUrl || undefined);
       onClose();
       toast({
         title: "头像已保存",

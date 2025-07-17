@@ -11,6 +11,7 @@ import { AvatarGenerator } from "@/components/AvatarGenerator";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { CustomerService } from "@/components/CustomerService";
 import { useToast } from "@/hooks/use-toast";
+import { saveCustomInfo, uploadAudio, CustomInfoDTO } from "@/lib/api";
 
 interface FormData {
   orderNumber: string;
@@ -19,6 +20,8 @@ interface FormData {
   personality: string;
   voiceBlob: Blob | null;
   avatarUrl: string | null;
+  audioUrl?: string;
+  originalPhotoUrl?: string;
 }
 
 interface UploadMaterialsProps {
@@ -79,21 +82,69 @@ export const UploadMaterials = ({ onNext, onBack }: UploadMaterialsProps) => {
     setShowConfirmDialog(true);
   };
 
-  const handleConfirmSubmit = () => {
+  const handleConfirmSubmit = async () => {
     setShowConfirmDialog(false);
-    onNext();
-    toast({
-      title: "提交成功",
-      description: "您的定制需求已提交，正在制作中",
-    });
+    
+    try {
+      const customInfo: CustomInfoDTO = {
+        orderNo: formData.orderNumber,
+        userName: formData.name || undefined,
+        phone: formData.phone || undefined,
+        personalityDesc: formData.personality,
+        audioUrl: formData.audioUrl,
+        avatarUrl: formData.avatarUrl || undefined,
+        originalPhotoUrl: formData.originalPhotoUrl,
+      };
+
+      const response = await saveCustomInfo(customInfo);
+      
+      if (response.code === 200) {
+        onNext();
+        toast({
+          title: "提交成功",
+          description: "您的定制需求已提交，正在制作中",
+        });
+      } else {
+        throw new Error(response.message);
+      }
+    } catch (error) {
+      toast({
+        title: "提交失败",
+        description: error instanceof Error ? error.message : "提交过程中出现错误，请重试",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleVoiceSave = (audioBlob: Blob) => {
-    setFormData(prev => ({ ...prev, voiceBlob: audioBlob }));
+  const handleVoiceSave = async (audioBlob: Blob) => {
+    try {
+      const response = await uploadAudio(audioBlob);
+      if (response.code === 200) {
+        setFormData(prev => ({ 
+          ...prev, 
+          voiceBlob: audioBlob,
+          audioUrl: response.data.url 
+        }));
+        toast({
+          title: "上传成功",
+          description: "音频文件已上传",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "上传失败",
+        description: "音频上传出现错误，请重试",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleAvatarSave = (imageUrl: string) => {
-    setFormData(prev => ({ ...prev, avatarUrl: imageUrl }));
+  const handleAvatarSave = (imageUrl: string, originalPhotoUrl?: string) => {
+    setFormData(prev => ({ 
+      ...prev, 
+      avatarUrl: imageUrl,
+      originalPhotoUrl 
+    }));
   };
 
   return (
