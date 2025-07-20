@@ -1,10 +1,11 @@
 // API接口集成
-const API_BASE_URL = '/openapi/manage';
+const API_BASE_URL = 'https://api.wwwfuture.gd.cn/openapi/manage';
 
 export interface FileUploadResponse {
   code: number;
   message: string;
   data: {
+    orderNo: string;
     url: string;
     fileName: string;
     fileSize: number;
@@ -19,7 +20,7 @@ export interface CustomInfoDTO {
   phone?: string;
   address?: string;
   personalityDesc: string;
-  audioUrl?: string;
+  audioUrl: string; // 必需字段
   avatarUrl?: string;
   originalPhotoUrl?: string;
 }
@@ -32,11 +33,11 @@ export interface ApiResponse<T> {
 }
 
 // 上传照片并生成2D头像
-export async function uploadPhotoAndGenerateAvatar(file: File): Promise<FileUploadResponse> {
+export async function uploadPhotoAndGenerateAvatar(file: File, orderNo: string): Promise<FileUploadResponse> {
   const formData = new FormData();
   formData.append('file', file);
 
-  const response = await fetch(`${API_BASE_URL}/custom-info/upload-photo`, {
+  const response = await fetch(`${API_BASE_URL}/custom-info/upload-photo?orderNo=${encodeURIComponent(orderNo)}`, {
     method: 'POST',
     body: formData,
   });
@@ -49,11 +50,11 @@ export async function uploadPhotoAndGenerateAvatar(file: File): Promise<FileUplo
 }
 
 // 上传音频文件
-export async function uploadAudio(file: Blob): Promise<FileUploadResponse> {
+export async function uploadAudio(file: Blob, orderNo: string): Promise<FileUploadResponse> {
   const formData = new FormData();
   formData.append('file', file);
 
-  const response = await fetch(`${API_BASE_URL}/custom-info/upload-audio`, {
+  const response = await fetch(`${API_BASE_URL}/custom-info/upload-audio?orderNo=${encodeURIComponent(orderNo)}`, {
     method: 'POST',
     body: formData,
   });

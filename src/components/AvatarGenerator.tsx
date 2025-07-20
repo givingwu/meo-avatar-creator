@@ -11,6 +11,7 @@ interface AvatarGeneratorProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (imageUrl: string, originalPhotoUrl?: string) => void;
+  orderNo: string;
 }
 
 interface GeneratedImage {
@@ -19,7 +20,7 @@ interface GeneratedImage {
   style: 'cartoon' | 'realistic';
 }
 
-export const AvatarGenerator = ({ isOpen, onClose, onSave }: AvatarGeneratorProps) => {
+export const AvatarGenerator = ({ isOpen, onClose, onSave, orderNo }: AvatarGeneratorProps) => {
   const [selectedGender, setSelectedGender] = useState<'male' | 'female'>('male');
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -53,7 +54,7 @@ export const AvatarGenerator = ({ isOpen, onClose, onSave }: AvatarGeneratorProp
       reader.readAsDataURL(file);
       
       try {
-        const response = await uploadPhotoAndGenerateAvatar(file);
+        const response = await uploadPhotoAndGenerateAvatar(file, orderNo);
         if (response.code === 200) {
           setOriginalPhotoUrl(response.data.url);
           toast({

@@ -118,7 +118,7 @@ export const UploadMaterials = ({ onNext, onBack }: UploadMaterialsProps) => {
 
   const handleVoiceSave = async (audioBlob: Blob) => {
     try {
-      const response = await uploadAudio(audioBlob);
+      const response = await uploadAudio(audioBlob, formData.orderNumber);
       if (response.code === 200) {
         setFormData(prev => ({ 
           ...prev, 
@@ -328,6 +328,7 @@ export const UploadMaterials = ({ onNext, onBack }: UploadMaterialsProps) => {
         isOpen={showAvatarGenerator}
         onClose={() => setShowAvatarGenerator(false)}
         onSave={handleAvatarSave}
+        orderNo={formData.orderNumber}
       />
 
       <ConfirmDialog
