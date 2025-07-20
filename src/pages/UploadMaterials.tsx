@@ -11,7 +11,9 @@ import { AvatarGenerator } from "@/components/AvatarGenerator";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { CustomerService } from "@/components/CustomerService";
 import { useToast } from "@/hooks/use-toast";
-import { saveCustomInfo, uploadAudio, CustomInfoDTO } from "@/lib/api";
+import { saveCustomInfo, uploadAudio, CustomInfoDTO } from "@/services/custom-info.service";
+import { validatePhone, validateOrderNo, validatePersonalityDesc } from "@/utils/validation.util";
+import { isSuccessResponse, formatErrorMessage } from "@/utils/response.util";
 
 interface FormData {
   orderNumber: string;
@@ -51,18 +53,24 @@ export const UploadMaterials = ({ onNext, onBack }: UploadMaterialsProps) => {
 
   const steps = ["阅读须知", "上传资料", "确认提交"];
 
-  const validatePhone = (phone: string) => {
-    return /^1[3-9]\d{9}$/.test(phone);
-  };
-
   const validateForm = () => {
     const errors = [];
     
-    if (!formData.orderNumber.trim()) errors.push("订单号");
-    if (formData.phone.trim() && !validatePhone(formData.phone)) errors.push("手机号码格式");
-    if (!formData.personality.trim()) errors.push("性格描述");
-    if (!formData.voiceBlob) errors.push("声音素材");
-    if (!formData.avatarUrl) errors.push("头像素材");
+    if (!validateOrderNo(formData.orderNumber)) {
+      errors.push("订单号格式不正确");
+    }
+    if (formData.phone.trim() && !validatePhone(formData.phone)) {
+      errors.push("手机号码格式不正确");
+    }
+    if (!validatePersonalityDesc(formData.personality)) {
+      errors.push("性格描述长度不符合要求（10-200字）");
+    }
+    if (!formData.voiceBlob) {
+      errors.push("声音素材");
+    }
+    if (!formData.avatarUrl) {
+      errors.push("头像素材");
+    }
 
     return errors;
   };
@@ -98,7 +106,7 @@ export const UploadMaterials = ({ onNext, onBack }: UploadMaterialsProps) => {
 
       const response = await saveCustomInfo(customInfo);
       
-      if (response.code === 200) {
+      if (isSuccessResponse(response)) {
         onNext();
         toast({
           title: "提交成功",
@@ -110,7 +118,7 @@ export const UploadMaterials = ({ onNext, onBack }: UploadMaterialsProps) => {
     } catch (error) {
       toast({
         title: "提交失败",
-        description: error instanceof Error ? error.message : "提交过程中出现错误，请重试",
+        description: formatErrorMessage(error),
         variant: "destructive",
       });
     }
@@ -119,7 +127,7 @@ export const UploadMaterials = ({ onNext, onBack }: UploadMaterialsProps) => {
   const handleVoiceSave = async (audioBlob: Blob) => {
     try {
       const response = await uploadAudio(audioBlob, formData.orderNumber);
-      if (response.code === 200) {
+      if (isSuccessResponse(response)) {
         setFormData(prev => ({ 
           ...prev, 
           voiceBlob: audioBlob,
@@ -133,7 +141,7 @@ export const UploadMaterials = ({ onNext, onBack }: UploadMaterialsProps) => {
     } catch (error) {
       toast({
         title: "上传失败",
-        description: "音频上传出现错误，请重试",
+        description: formatErrorMessage(error),
         variant: "destructive",
       });
     }

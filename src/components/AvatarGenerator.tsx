@@ -5,7 +5,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { uploadPhotoAndGenerateAvatar } from "@/lib/api";
+import { uploadPhotoAndGenerateAvatar } from "@/services/custom-info.service";
+import { isSuccessResponse, formatErrorMessage } from "@/utils/response.util";
 
 interface AvatarGeneratorProps {
   isOpen: boolean;
@@ -55,7 +56,7 @@ export const AvatarGenerator = ({ isOpen, onClose, onSave, orderNo }: AvatarGene
       
       try {
         const response = await uploadPhotoAndGenerateAvatar(file, orderNo);
-        if (response.code === 200) {
+        if (isSuccessResponse(response)) {
           setOriginalPhotoUrl(response.data.url);
           toast({
             title: "图片上传成功",
@@ -65,7 +66,7 @@ export const AvatarGenerator = ({ isOpen, onClose, onSave, orderNo }: AvatarGene
       } catch (error) {
         toast({
           title: "上传失败",
-          description: "图片上传出现错误，请重试",
+          description: formatErrorMessage(error),
           variant: "destructive",
         });
       }
