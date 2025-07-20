@@ -15,11 +15,11 @@ export const VoiceRecorder = ({ isOpen, onClose, onSave }: VoiceRecorderProps) =
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [recordingTime, setRecordingTime] = useState(0);
-  
+
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   const { toast } = useToast();
 
   const sampleText = "《静夜思》是唐代诗人李白所作、流传最广泛的一首五言乐府诗，全文为：窗前明月光，疑是地上霜，举头望明月，低头思故乡";
@@ -41,7 +41,7 @@ export const VoiceRecorder = ({ isOpen, onClose, onSave }: VoiceRecorderProps) =
       mediaRecorder.start();
       setIsRecording(true);
       setRecordingTime(0);
-      
+
       timerRef.current = setInterval(() => {
         setRecordingTime(prev => prev + 1);
       }, 1000);
@@ -66,7 +66,7 @@ export const VoiceRecorder = ({ isOpen, onClose, onSave }: VoiceRecorderProps) =
       if (timerRef.current) {
         clearInterval(timerRef.current);
       }
-      
+
       toast({
         title: "录音完成",
         description: "您可以播放预览或重新录制",
@@ -79,12 +79,12 @@ export const VoiceRecorder = ({ isOpen, onClose, onSave }: VoiceRecorderProps) =
       const url = URL.createObjectURL(audioBlob);
       const audio = new Audio(url);
       audioRef.current = audio;
-      
+
       audio.onended = () => {
         setIsPlaying(false);
         URL.revokeObjectURL(url);
       };
-      
+
       audio.play();
       setIsPlaying(true);
     }
@@ -129,7 +129,7 @@ export const VoiceRecorder = ({ isOpen, onClose, onSave }: VoiceRecorderProps) =
         <DialogHeader>
           <DialogTitle className="text-center">请录入声纹</DialogTitle>
         </DialogHeader>
-        
+
         <div className="space-y-6">
           <div className="bg-muted/50 rounded-lg p-4">
             <p className="text-sm text-muted-foreground mb-2">
@@ -162,7 +162,7 @@ export const VoiceRecorder = ({ isOpen, onClose, onSave }: VoiceRecorderProps) =
                   <p className="text-lg font-mono">{formatTime(recordingTime)}</p>
                   <p className="text-sm text-muted-foreground">正在录音...</p>
                 </div>
-                
+
                 <Button
                   onClick={stopRecording}
                   variant="outline"
@@ -191,7 +191,7 @@ export const VoiceRecorder = ({ isOpen, onClose, onSave }: VoiceRecorderProps) =
                     {isPlaying ? <Pause className="h-4 w-4 mr-2" /> : <Play className="h-4 w-4 mr-2" />}
                     {isPlaying ? "暂停" : "播放"}
                   </Button>
-                  
+
                   <Button
                     onClick={deleteRecording}
                     variant="outline"
@@ -199,7 +199,7 @@ export const VoiceRecorder = ({ isOpen, onClose, onSave }: VoiceRecorderProps) =
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
-                  
+
                   <Button
                     onClick={startRecording}
                     variant="outline"
