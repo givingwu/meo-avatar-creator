@@ -24,7 +24,7 @@ export const Header = ({ title, showBack = false, onBack }: HeaderProps) => {
           )}
           <h1 className="text-lg font-bold text-foreground">{title}</h1>
         </div>
-        
+
         <div className="flex items-center gap-2">
           <div className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
             MEO

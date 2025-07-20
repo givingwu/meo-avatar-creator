@@ -1,6 +1,7 @@
-import { MessageCircle, X } from "lucide-react";
+import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import serviceQrcode from "@/assets/service-qrcode.png";
 
 interface CustomerServiceProps {
   isOpen: boolean;
@@ -14,11 +15,11 @@ export const CustomerService = ({ isOpen, onClose }: CustomerServiceProps) => {
         <DialogHeader>
           <DialogTitle className="text-center">联系企微客服</DialogTitle>
         </DialogHeader>
-        
+
         <div className="space-y-6 text-center">
           <div className="bg-muted/50 rounded-lg p-6">
             <div className="w-32 h-32 bg-gradient-primary rounded-lg mx-auto mb-4 flex items-center justify-center">
-              <MessageCircle className="h-16 w-16 text-primary-foreground" />
+              <img src={serviceQrcode} alt="企微客服" className="w-full h-full" />
             </div>
             <p className="text-sm text-muted-foreground mb-2">
               扫描二维码添加企微客服
