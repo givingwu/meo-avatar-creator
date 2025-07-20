@@ -12,8 +12,6 @@ export const ReadingNotice = ({ onNext, onBack }: ReadingNoticeProps) => {
   const [acknowledged, setAcknowledged] = useState(false);
 
   const noticeContent = `
-阅读须知！
-
 在使用MEO自主定制服务前，请仔细阅读以下重要信息：
 
 1. 定制说明
@@ -47,21 +45,21 @@ export const ReadingNotice = ({ onNext, onBack }: ReadingNoticeProps) => {
   return (
     <div className="min-h-screen bg-background">
       <Header title="MEO自主定制" showBack onBack={onBack} />
-      
+
       <div className="container mx-auto px-4 py-6 max-w-2xl">
         <div className="bg-card rounded-xl shadow-soft p-6 mb-6">
           <h2 className="text-xl font-bold text-center mb-6 text-foreground">
             阅读须知
           </h2>
-          
-          <div className="bg-muted/30 rounded-lg p-6 mb-6 max-h-96 overflow-y-auto">
+
+          <div className="bg-muted/30 rounded-lg p-6 mb-6 overflow-y-auto">
             <pre className="text-sm leading-relaxed text-foreground whitespace-pre-wrap font-sans">
               {noticeContent}
             </pre>
           </div>
 
           <div className="space-y-4">
-            <label className="flex items-start gap-3 cursor-pointer group">
+            <label className="flex items-center gap-3 cursor-pointer group">
               <div className="relative mt-1">
                 <input
                   type="checkbox"
@@ -71,8 +69,8 @@ export const ReadingNotice = ({ onNext, onBack }: ReadingNoticeProps) => {
                 />
                 <div className={`
                   w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-200
-                  ${acknowledged 
-                    ? 'bg-primary border-primary shadow-soft' 
+                  ${acknowledged
+                    ? 'bg-primary border-primary shadow-soft'
                     : 'border-border group-hover:border-primary/50'
                   }
                 `}>

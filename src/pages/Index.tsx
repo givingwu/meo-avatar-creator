@@ -1,18 +1,16 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { ReadingNotice } from "./ReadingNotice";
 import { UploadMaterials } from "./UploadMaterials";
 import { Completion } from "./Completion";
 import { Button } from "@/components/ui/button";
-import { Header } from "@/components/Header";
 import { Sparkles, User, Mic } from "lucide-react";
-import meoLogo from "@/assets/meo-logo.png";
 
 type Step = 'welcome' | 'reading' | 'upload' | 'completion';
 
 const Index = () => {
   const [currentStep, setCurrentStep] = useState<Step>('welcome');
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     switch (currentStep) {
       case 'welcome':
         setCurrentStep('reading');
@@ -24,9 +22,9 @@ const Index = () => {
         setCurrentStep('completion');
         break;
     }
-  };
+  }, [currentStep]);
 
-  const handleBack = () => {
+  const handleBack = useCallback(() => {
     switch (currentStep) {
       case 'reading':
         setCurrentStep('welcome');
@@ -38,11 +36,11 @@ const Index = () => {
         setCurrentStep('upload');
         break;
     }
-  };
+  }, [currentStep]);
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     setCurrentStep('welcome');
-  };
+  }, []);
 
   if (currentStep === 'reading') {
     return <ReadingNotice onNext={handleNext} onBack={handleBack} />;
@@ -59,22 +57,10 @@ const Index = () => {
   // Welcome page
   return (
     <div className="min-h-screen bg-gradient-hero">
-      <Header title="MEO自主定制" />
-      
       <div className="container mx-auto px-4 py-8 max-w-2xl">
         <div className="text-center space-y-8">
           {/* Hero Section */}
           <div className="space-y-6">
-            <div className="flex justify-center">
-              <div className="w-24 h-24 bg-card rounded-2xl shadow-glow flex items-center justify-center">
-                <img 
-                  src={meoLogo} 
-                  alt="MEO Logo" 
-                  className="w-16 h-16 object-contain"
-                />
-              </div>
-            </div>
-            
             <div className="space-y-3">
               <h1 className="text-4xl font-bold text-primary-foreground">
                 MEO自主定制
@@ -96,17 +82,17 @@ const Index = () => {
               </div>
               <h3 className="font-semibold mb-2">声音克隆</h3>
               <p className="text-sm text-muted-foreground">
-                录制您的声音，AI将学习并复制您独特的音色
+                录制您的声音，AI 将学习并复制您独特的音色
               </p>
             </div>
-            
+
             <div className="bg-card/95 backdrop-blur-sm rounded-xl p-6 shadow-medium">
               <div className="w-12 h-12 bg-gradient-secondary rounded-lg flex items-center justify-center mb-4 mx-auto">
                 <User className="h-6 w-6 text-secondary-foreground" />
               </div>
               <h3 className="font-semibold mb-2">形象定制</h3>
               <p className="text-sm text-muted-foreground">
-                上传照片生成专属3D数字形象，卡通或写实风格
+                上传照片生成专属 3D 数字形象，卡通或写实风格
               </p>
             </div>
           </div>
@@ -115,10 +101,10 @@ const Index = () => {
           <div className="bg-card rounded-2xl p-8 shadow-strong space-y-6">
             <div className="space-y-3">
               <h2 className="text-2xl font-bold text-foreground">
-                开始定制您的MEO
+                开始定制您的 MEO
               </h2>
               <p className="text-muted-foreground">
-                只需几个简单步骤，即可获得专属AI伙伴
+                只需几个简单步骤，即可获得专属 AI 伙伴
               </p>
             </div>
 
@@ -140,7 +126,7 @@ const Index = () => {
             <Button
               onClick={handleNext}
               variant="hero"
-              size="xl"
+              size="lg"
               className="w-full"
             >
               <Sparkles className="h-5 w-5 mr-2" />
