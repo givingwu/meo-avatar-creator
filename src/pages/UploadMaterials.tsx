@@ -46,16 +46,16 @@ export const UploadMaterials = ({ onNext, onBack }: UploadMaterialsProps) => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [showCustomerService, setShowCustomerService] = useState(false);
   const [expandedPersonality, setExpandedPersonality] = useState(false);
-  
+
   const { toast } = useToast();
 
-  const personalityTemplate = `比如：在交流中，经常是自由发散的聊天。回复要简洁，答案不必详尽无遗，就像人类不可能知道所有信息一样。既提供情绪支持，又给出逻辑明晰、条理清楚且充满人情味的建议或解答。`;
+  const personalityTemplate = `在交流中，经常是自由发散的聊天。回复要简洁，答案不必详尽无遗，就像人类不可能知道所有信息一样。既提供情绪支持，又给出逻辑明晰、条理清楚且充满人情味的建议或解答。`;
 
   const steps = ["阅读须知", "上传资料", "确认提交"];
 
   const validateForm = () => {
     const errors = [];
-    
+
     if (!validateOrderNo(formData.orderNumber)) {
       errors.push("订单号格式不正确");
     }
@@ -77,7 +77,7 @@ export const UploadMaterials = ({ onNext, onBack }: UploadMaterialsProps) => {
 
   const handleSubmit = () => {
     const errors = validateForm();
-    
+
     if (errors.length > 0) {
       toast({
         title: "请完善以下信息",
@@ -92,7 +92,7 @@ export const UploadMaterials = ({ onNext, onBack }: UploadMaterialsProps) => {
 
   const handleConfirmSubmit = async () => {
     setShowConfirmDialog(false);
-    
+
     try {
       const customInfo: CustomInfoDTO = {
         orderNo: formData.orderNumber,
@@ -105,7 +105,7 @@ export const UploadMaterials = ({ onNext, onBack }: UploadMaterialsProps) => {
       };
 
       const response = await saveCustomInfo(customInfo);
-      
+
       if (isSuccessResponse(response)) {
         onNext();
         toast({
@@ -128,10 +128,10 @@ export const UploadMaterials = ({ onNext, onBack }: UploadMaterialsProps) => {
     try {
       const response = await uploadAudio(audioBlob, formData.orderNumber);
       if (isSuccessResponse(response)) {
-        setFormData(prev => ({ 
-          ...prev, 
+        setFormData(prev => ({
+          ...prev,
           voiceBlob: audioBlob,
-          audioUrl: response.data.url 
+          audioUrl: response.data.url
         }));
         toast({
           title: "上传成功",
@@ -148,20 +148,20 @@ export const UploadMaterials = ({ onNext, onBack }: UploadMaterialsProps) => {
   };
 
   const handleAvatarSave = (imageUrl: string, originalPhotoUrl?: string) => {
-    setFormData(prev => ({ 
-      ...prev, 
+    setFormData(prev => ({
+      ...prev,
       avatarUrl: imageUrl,
-      originalPhotoUrl 
+      originalPhotoUrl
     }));
   };
 
   return (
     <div className="min-h-screen bg-background">
       <Header title="MEO自主定制" showBack onBack={onBack} />
-      
+
       <div className="container mx-auto px-4 py-6 max-w-2xl">
         <StepIndicator currentStep={1} totalSteps={3} steps={steps} />
-        
+
         <div className="bg-card rounded-xl shadow-soft p-6 space-y-6">
           <div className="grid gap-6">
             <div className="space-y-2">
@@ -229,7 +229,7 @@ export const UploadMaterials = ({ onNext, onBack }: UploadMaterialsProps) => {
                     {expandedPersonality ? <ChevronUp className="h-3 w-3 ml-1" /> : <ChevronDown className="h-3 w-3 ml-1" />}
                   </Button>
                 </div>
-                
+
                 {expandedPersonality && (
                   <div className="bg-muted/30 rounded-lg p-3">
                     <p className="text-xs text-muted-foreground mb-2">参考模板：</p>
