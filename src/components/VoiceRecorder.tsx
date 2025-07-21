@@ -18,7 +18,7 @@ interface VoiceRecorderProps {
 export const VoiceRecorder = ({ isOpen, onClose, onSuccess, orderNumber }: VoiceRecorderProps) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [audioFile, setAudioFile] = useState<File | null>(null);
   const [recordingTime, setRecordingTime] = useState(0);
   // 添加isSaving状态
   const [isSaving, setIsSaving] = useState(false);
@@ -31,6 +31,7 @@ export const VoiceRecorder = ({ isOpen, onClose, onSuccess, orderNumber }: Voice
 
   const sampleText = "《静夜思》是唐代诗人李白所作、流传最广泛的一首五言乐府诗，全文为：窗前明月光，疑是地上霜，举头望明月，低头思故乡";
 
+  // 修改录音完成后的Blob创建逻辑 (L36-48部分)
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -39,9 +40,19 @@ export const VoiceRecorder = ({ isOpen, onClose, onSuccess, orderNumber }: Voice
 
       const chunks: BlobPart[] = [];
       mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+      // 修改录音完成后的文件创建逻辑 (L48-49部分)
       mediaRecorder.onstop = () => {
-        const blob = new Blob(chunks, { type: 'audio/mp3' });
-        setAudioBlob(blob);
+        const fileName = `${orderNumber}_${Date.now()}.wav`;
+        // 1. 显式指定正确的MIME类型为audio/wav
+        // 2. 确保从源头上创建正确类型的Blob
+        const wavBlob = new Blob(chunks, { type: 'audio/wav' });
+        // 3. 创建File对象时再次确认MIME类型
+        const audioFile = new File([wavBlob], fileName, {
+          type: 'audio/wav',
+          lastModified: Date.now()
+        });
+        console.log('AudioFIle', audioFile)
+        setAudioFile(audioFile);
         stream.getTracks().forEach(track => track.stop());
       };
 
@@ -82,8 +93,8 @@ export const VoiceRecorder = ({ isOpen, onClose, onSuccess, orderNumber }: Voice
   };
 
   const playAudio = () => {
-    if (audioBlob) {
-      const url = URL.createObjectURL(audioBlob);
+    if (audioFile) {
+      const url = URL.createObjectURL(audioFile);
       const audio = new Audio(url);
       audioRef.current = audio;
 
@@ -105,7 +116,7 @@ export const VoiceRecorder = ({ isOpen, onClose, onSuccess, orderNumber }: Voice
   };
 
   const deleteRecording = () => {
-    setAudioBlob(null);
+    setAudioFile(null);
     setRecordingTime(0);
     setIsPlaying(false);
     if (audioRef.current) {
@@ -114,10 +125,13 @@ export const VoiceRecorder = ({ isOpen, onClose, onSuccess, orderNumber }: Voice
   };
 
   const handleSave = async () => {
-    if (audioBlob && !isSaving) {
-      setIsSaving(true); // 开始保存，设置isSaving为true
+    if (audioFile && !isSaving) {
+      setIsSaving(true);
+
       try {
-        const response = await uploadAudio(audioBlob, orderNumber);
+        // 确保传递File对象而非原始Blob
+        const response = await uploadAudio(audioFile, orderNumber);
+
         if (isSuccessResponse(response)) {
           onSuccess(response.data.url);
           onClose();
@@ -162,7 +176,7 @@ export const VoiceRecorder = ({ isOpen, onClose, onSuccess, orderNumber }: Voice
           </div>
 
           <div className="flex flex-col items-center space-y-4">
-            {!isRecording && !audioBlob && (
+            {!isRecording && !audioFile && (
               <Button
                 onClick={startRecording}
                 variant="hero"
@@ -196,7 +210,7 @@ export const VoiceRecorder = ({ isOpen, onClose, onSuccess, orderNumber }: Voice
               </div>
             )}
 
-            {audioBlob && !isRecording && (
+            {audioFile && !isRecording && (
               <div className="w-full space-y-4">
                 <div className="bg-success/10 border border-success/20 rounded-lg p-4 text-center">
                   <p className="text-success font-medium">录音完成！</p>
