@@ -1,20 +1,27 @@
 import { useState, useRef } from "react";
-import { Mic, MicOff, Play, Pause, Trash2, RotateCcw } from "lucide-react";
+import { Mic, MicOff, Play, Pause, Trash2, RotateCcw, Loader } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+// 新增导入
+import { uploadAudio } from "@/services/custom-info.service";
+import { isSuccessResponse } from "@/utils/response.util";
+import { formatErrorMessage } from "@/utils/response.util";
 
 interface VoiceRecorderProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (audioBlob: Blob) => void;
+  onSuccess: (audioUrl: string) => void;
+  orderNumber: string;
 }
 
-export const VoiceRecorder = ({ isOpen, onClose, onSave }: VoiceRecorderProps) => {
+export const VoiceRecorder = ({ isOpen, onClose, onSuccess, orderNumber }: VoiceRecorderProps) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [recordingTime, setRecordingTime] = useState(0);
+  // 添加isSaving状态
+  const [isSaving, setIsSaving] = useState(false);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -33,7 +40,7 @@ export const VoiceRecorder = ({ isOpen, onClose, onSave }: VoiceRecorderProps) =
       const chunks: BlobPart[] = [];
       mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
       mediaRecorder.onstop = () => {
-        const blob = new Blob(chunks, { type: 'audio/wav' });
+        const blob = new Blob(chunks, { type: 'audio/mp3' });
         setAudioBlob(blob);
         stream.getTracks().forEach(track => track.stop());
       };
@@ -106,14 +113,28 @@ export const VoiceRecorder = ({ isOpen, onClose, onSave }: VoiceRecorderProps) =
     }
   };
 
-  const handleSave = () => {
-    if (audioBlob) {
-      onSave(audioBlob);
-      onClose();
-      toast({
-        title: "声音素材已保存",
-        description: "您的声纹已成功录制",
-      });
+  const handleSave = async () => {
+    if (audioBlob && !isSaving) {
+      setIsSaving(true); // 开始保存，设置isSaving为true
+      try {
+        const response = await uploadAudio(audioBlob, orderNumber);
+        if (isSuccessResponse(response)) {
+          onSuccess(response.data.url);
+          onClose();
+          toast({
+            title: "上传成功",
+            description: "音频文件已上传",
+          });
+        }
+      } catch (error) {
+        toast({
+          title: "上传失败",
+          description: formatErrorMessage(error),
+          variant: "destructive",
+        });
+      } finally {
+        setIsSaving(false); // 无论成功失败，最终设置isSaving为false
+      }
     }
   };
 
@@ -214,8 +235,13 @@ export const VoiceRecorder = ({ isOpen, onClose, onSave }: VoiceRecorderProps) =
                   variant="meo"
                   size="lg"
                   className="w-full"
+                  disabled={isSaving}
                 >
-                  确认使用此录音
+                  {isSaving ? (
+                    <>正在保存... <Loader className="ml-2 h-4 w-4 animate-spin" /></>
+                  ) : (
+                    "确认使用此录音"
+                  )}
                 </Button>
               </div>
             )}
