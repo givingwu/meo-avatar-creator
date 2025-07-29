@@ -139,6 +139,32 @@ export const UploadMaterials = ({ onNext, onBack }: UploadMaterialsProps) => {
     }));
   };
 
+  const handleVoiceRecorderClick = () => {
+    if (!validateOrderNo(formData.orderNumber)) {
+      toast({
+        title: "请先填写订单号",
+        description: "订单号格式不正确，请填写 6-20 位的有效订单号",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setShowVoiceRecorder(true);
+  };
+
+  const handleAvatarGeneratorClick = () => {
+    if (!validateOrderNo(formData.orderNumber)) {
+      toast({
+        title: "请先填写订单号",
+        description: "订单号格式不正确，请填写 6-20 位的有效订单号",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setShowAvatarGenerator(true);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header title="MEO自主定制" showBack onBack={onBack} />
@@ -163,7 +189,7 @@ export const UploadMaterials = ({ onNext, onBack }: UploadMaterialsProps) => {
 
             <div className="space-y-2">
               <Label htmlFor="name" className="text-sm font-medium">
-                收件人姓名 <span className="text-xs text-muted-foreground">（可提供收件人信息，若定制过程中有声音和头像上的疑问，客服会据此信息联系您）</span>
+                收件人姓名 <span className="text-xs text-muted-foreground">（若定制过程中有声音和头像上的疑问，客服会据此信息联系您）</span>
               </Label>
               <Input
                 id="name"
@@ -176,13 +202,13 @@ export const UploadMaterials = ({ onNext, onBack }: UploadMaterialsProps) => {
 
             <div className="space-y-2">
               <Label htmlFor="phone" className="text-sm font-medium">
-                收件手机号码 <span className="text-xs text-muted-foreground">（可提供收件人信息，若定制过程中有声音和头像上的疑问，客服会据此信息联系您）</span>
+                收件人手机号
               </Label>
               <Input
                 id="phone"
                 value={formData.phone}
                 onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                placeholder="请输入11位手机号码"
+                placeholder="请输入 11 位手机号码"
                 maxLength={11}
                 className="transition-all duration-200 focus:shadow-soft"
               />
@@ -237,7 +263,7 @@ export const UploadMaterials = ({ onNext, onBack }: UploadMaterialsProps) => {
               <div className="space-y-2">
                 <Label className="text-sm font-medium">声音素材*</Label>
                 <Button
-                  onClick={() => setShowVoiceRecorder(true)}
+                  onClick={handleVoiceRecorderClick}
                   variant={formData.audioUrl ? "success" : "outline"}
                   className="w-full justify-start h-auto p-4"
                 >
@@ -256,7 +282,7 @@ export const UploadMaterials = ({ onNext, onBack }: UploadMaterialsProps) => {
               <div className="space-y-2">
                 <Label className="text-sm font-medium">头像素材*</Label>
                 <Button
-                  onClick={() => setShowAvatarGenerator(true)}
+                  onClick={handleAvatarGeneratorClick}
                   variant={formData.avatarUrl ? "success" : "outline"}
                   className="w-full justify-start h-auto p-4"
                 >
