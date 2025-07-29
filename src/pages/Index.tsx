@@ -56,20 +56,17 @@ const Index = () => {
 
   // Welcome page
   return (
-    <div className="min-h-screen bg-gradient-hero">
+    <div className="overflow-y-auto min-h-screen bg-gradient-hero">
       <div className="container mx-auto px-4 py-8 max-w-2xl">
-        <div className="text-center space-y-8">
+        <div className="text-center space-y-6">
           {/* Hero Section */}
           <div className="space-y-6">
             <div className="space-y-3">
               <h1 className="text-4xl font-bold text-primary-foreground">
-                MEO自主定制
+                MEO 自主定制
               </h1>
-              <p className="text-xl text-primary-foreground/90">
-                打造您的专属AI数字伙伴
-              </p>
-              <p className="text-primary-foreground/70 leading-relaxed">
-                通过声音和外观定制，创造独一无二的AI角色
+              <p className="text-primary-foreground/90">
+                通过声音和外观定制，打造您的专属 AI 数字伙伴
               </p>
             </div>
           </div>
@@ -100,12 +97,9 @@ const Index = () => {
           {/* CTA */}
           <div className="bg-card rounded-2xl p-8 shadow-strong space-y-6">
             <div className="space-y-3">
-              <h2 className="text-2xl font-bold text-foreground">
-                开始定制您的 MEO
+              <h2 className="text-xl text-left font-bold text-foreground">
+                定制步骤
               </h2>
-              <p className="text-muted-foreground">
-                只需几个简单步骤，即可获得专属 AI 伙伴
-              </p>
             </div>
 
             <div className="space-y-4">
@@ -134,7 +128,7 @@ const Index = () => {
             </Button>
 
             <p className="text-xs text-muted-foreground">
-              制作周期：3-7个工作日 | 支持全国包邮
+              制作周期：3-7 个工作日 | 支持全国包邮
             </p>
           </div>
         </div>

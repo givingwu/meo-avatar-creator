@@ -12,12 +12,12 @@ export const ReadingNotice = ({ onNext, onBack }: ReadingNoticeProps) => {
   const [acknowledged, setAcknowledged] = useState(false);
 
   const noticeContent = `
-在使用MEO自主定制服务前，请仔细阅读以下重要信息：
+在使用 MEO 自主定制服务前，请仔细阅读以下重要信息：
 
 1. 定制说明
-• 本服务为AI数字人定制服务
+• 本服务为 AI 数字人定制服务
 • 定制过程需要提供声音和头像素材
-• 生成时间约3-7个工作日
+• 生成时间约 3-7 个工作日
 
 2. 素材要求
 • 声音素材：需录制指定文本，确保音质清晰
@@ -44,11 +44,11 @@ export const ReadingNotice = ({ onNext, onBack }: ReadingNoticeProps) => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header title="MEO自主定制" showBack onBack={onBack} />
+      <Header title="MEO 自主定制" showBack onBack={onBack} />
 
       <div className="container mx-auto px-4 py-6 max-w-2xl">
         <div className="bg-card rounded-xl shadow-soft p-6 mb-6">
-          <h2 className="text-xl font-bold text-center mb-6 text-foreground">
+          <h2 className="text-xl font-bold text-center mb-4 text-foreground">
             阅读须知
           </h2>
 

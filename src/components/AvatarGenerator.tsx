@@ -29,19 +29,19 @@ export const AvatarGenerator = ({ isOpen, onClose, onSave, orderNo }: AvatarGene
   const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  
+
   const { toast } = useToast();
 
   // Mock generated images for demo
   const mockGeneratedImages: GeneratedImage[] = [
-    { id: '1', url: '/placeholder.svg', style: 'cartoon' },
-    { id: '2', url: '/placeholder.svg', style: 'cartoon' },
-    { id: '3', url: '/placeholder.svg', style: 'cartoon' },
-    { id: '4', url: '/placeholder.svg', style: 'cartoon' },
-    { id: '5', url: '/placeholder.svg', style: 'realistic' },
-    { id: '6', url: '/placeholder.svg', style: 'realistic' },
-    { id: '7', url: '/placeholder.svg', style: 'realistic' },
-    { id: '8', url: '/placeholder.svg', style: 'realistic' },
+    { id: '1', url: '/placeholder1.svg', style: 'cartoon' },
+    { id: '2', url: '/placeholder2.svg', style: 'cartoon' },
+    { id: '3', url: '/placeholder3.svg', style: 'cartoon' },
+    { id: '4', url: '/placeholder4.svg', style: 'cartoon' },
+    { id: '5', url: '/placeholder5.svg', style: 'realistic' },
+    { id: '6', url: '/placeholder6.svg', style: 'realistic' },
+    { id: '7', url: '/placeholder7.svg', style: 'realistic' },
+    { id: '8', url: '/placeholder8.svg', style: 'realistic' },
   ];
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,14 +53,14 @@ export const AvatarGenerator = ({ isOpen, onClose, onSave, orderNo }: AvatarGene
         setUploadedImage(e.target?.result as string);
       };
       reader.readAsDataURL(file);
-      
+
       try {
         const response = await uploadPhotoAndGenerateAvatar(file, orderNo);
         if (isSuccessResponse(response)) {
           setOriginalPhotoUrl(response.data.url);
           toast({
             title: "图片上传成功",
-            description: "您现在可以生成AI头像了",
+            description: "您现在可以生成 AI 头像了",
           });
         }
       } catch (error) {
@@ -71,6 +71,10 @@ export const AvatarGenerator = ({ isOpen, onClose, onSave, orderNo }: AvatarGene
         });
       }
     }
+  };
+
+  const handleClickUploadProgrammatically = () => {
+    document.getElementById('avatar-upload')?.click();
   };
 
   const generateAvatars = async () => {
@@ -151,12 +155,12 @@ export const AvatarGenerator = ({ isOpen, onClose, onSave, orderNo }: AvatarGene
                 className="flex gap-6"
               >
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="male" id="male" />
-                  <Label htmlFor="male" className="font-medium">男生</Label>
-                </div>
-                <div className="flex items-center space-x-2">
                   <RadioGroupItem value="female" id="female" />
                   <Label htmlFor="female" className="font-medium">女生</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="male" id="male" />
+                  <Label htmlFor="male" className="font-medium">男生</Label>
                 </div>
               </RadioGroup>
             </div>
@@ -173,7 +177,7 @@ export const AvatarGenerator = ({ isOpen, onClose, onSave, orderNo }: AvatarGene
                     className="hidden"
                     id="avatar-upload"
                   />
-                  <Label htmlFor="avatar-upload">
+                  <Label htmlFor="avatar-upload" onClick={handleClickUploadProgrammatically}>
                     <Button variant="outline" className="cursor-pointer">
                       <Upload className="h-4 w-4 mr-2" />
                       点击上传
@@ -193,7 +197,7 @@ export const AvatarGenerator = ({ isOpen, onClose, onSave, orderNo }: AvatarGene
                       删除头像
                     </Button>
                   </div>
-                  
+
                   <div className="relative">
                     <img
                       src={uploadedImage}
