@@ -22,9 +22,8 @@ interface GeneratedImage {
 }
 
 export const AvatarGenerator = ({ isOpen, onClose, onSave, orderNo }: AvatarGeneratorProps) => {
-  const [selectedGender, setSelectedGender] = useState<'male' | 'female'>('male');
+  const [selectedGender, setSelectedGender] = useState<'male' | 'female'>('female');
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [originalPhotoUrl, setOriginalPhotoUrl] = useState<string | null>(null);
   const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -46,8 +45,8 @@ export const AvatarGenerator = ({ isOpen, onClose, onSave, orderNo }: AvatarGene
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+
     if (file) {
-      setUploadedFile(file);
       const reader = new FileReader();
       reader.onload = (e) => {
         setUploadedImage(e.target?.result as string);
@@ -56,12 +55,17 @@ export const AvatarGenerator = ({ isOpen, onClose, onSave, orderNo }: AvatarGene
 
       try {
         const response = await uploadPhotoAndGenerateAvatar(file, orderNo);
+
         if (isSuccessResponse(response)) {
-          setOriginalPhotoUrl(response.data.url);
-          toast({
-            title: "图片上传成功",
-            description: "您现在可以生成 AI 头像了",
-          });
+          if (response.data.uploadSuccess && response.data.url) {
+            toast({
+              title: "图片上传成功",
+              description: "您现在可以生成 AI 头像了",
+            });
+            setOriginalPhotoUrl(response.data.url);
+          } else {
+            throw new Error(response.data.detectionFailureReason)
+          }
         }
       } catch (error) {
         toast({
@@ -84,11 +88,12 @@ export const AvatarGenerator = ({ isOpen, onClose, onSave, orderNo }: AvatarGene
         description: "需要上传头像图片才能进行AI生成",
         variant: "destructive",
       });
+
       return;
     }
 
     setIsGenerating(true);
-    
+
     // Simulate API call delay
     setTimeout(() => {
       setGeneratedImages(mockGeneratedImages);
@@ -102,7 +107,6 @@ export const AvatarGenerator = ({ isOpen, onClose, onSave, orderNo }: AvatarGene
 
   const deleteUploadedImage = () => {
     setUploadedImage(null);
-    setUploadedFile(null);
     setOriginalPhotoUrl(null);
     setGeneratedImages([]);
     setSelectedImage(null);
@@ -121,7 +125,7 @@ export const AvatarGenerator = ({ isOpen, onClose, onSave, orderNo }: AvatarGene
 
   const requirements = [
     "完整正面",
-    "不佩戴饰品", 
+    "不佩戴饰品",
     "头部特写",
     "背景干净"
   ];

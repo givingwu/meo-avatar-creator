@@ -11,7 +11,7 @@ import { AvatarGenerator } from "@/components/AvatarGenerator";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { CustomerService } from "@/components/CustomerService";
 import { useToast } from "@/hooks/use-toast";
-import { saveCustomInfo, uploadAudio, CustomInfoDTO } from "@/services/custom-info.service";
+import { saveCustomInfo, CustomInfoDTO } from "@/services/custom-info.service";
 import { validatePhone, validateOrderNo, validatePersonalityDesc } from "@/utils/validation.util";
 import { isSuccessResponse, formatErrorMessage } from "@/utils/response.util";
 
