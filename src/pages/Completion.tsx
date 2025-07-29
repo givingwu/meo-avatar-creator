@@ -73,15 +73,6 @@ export const Completion = ({ onBack, onReset }: CompletionProps) => {
           </div>
 
           <div className="space-y-3">
-            <Button
-              onClick={onReset}
-              variant="meo"
-              size="lg"
-              className="w-full"
-            >
-              再次定制
-            </Button>
-
             <p className="text-xs text-muted-foreground">
               感谢您选择 MEO 定制服务，我们将为您打造独一无二的 AI 伙伴
             </p>
