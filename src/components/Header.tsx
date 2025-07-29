@@ -9,7 +9,7 @@ interface HeaderProps {
 
 export const Header = ({ title, showBack = false, onBack }: HeaderProps) => {
   return (
-    <header className="bg-card border-b border-border/50 sticky top-0 z-40 backdrop-blur-sm bg-card/95">
+    <header className="bg-card border-b border-border/50 sticky top-0 z-40 backdrop-blur-sm">
       <div className="container mx-auto px-4 h-14 flex items-center justify-between">
         <div className="flex items-center gap-3">
           {showBack && (
