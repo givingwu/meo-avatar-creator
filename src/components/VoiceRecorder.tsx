@@ -81,6 +81,7 @@ export const VoiceRecorder = ({ isOpen, onClose, onSuccess, orderNumber }: Voice
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
+
       if (timerRef.current) {
         clearInterval(timerRef.current);
       }
@@ -119,9 +120,35 @@ export const VoiceRecorder = ({ isOpen, onClose, onSuccess, orderNumber }: Voice
     setAudioFile(null);
     setRecordingTime(0);
     setIsPlaying(false);
+    onSuccess('')
+
     if (audioRef.current) {
       audioRef.current.pause();
     }
+  };
+
+  const beforeClose = () => {
+    // 如果正在录音，先停止
+    if (isRecording && mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+    // 停止计时器
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+
+    // 停止播放
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+    // 清空录音文件和播放状态
+    setAudioFile(null);
+    setIsPlaying(false);
+    // 通知父组件录音已被清空
+    onSuccess("");
+    // 通知父组建关闭弹窗
+    onClose()
   };
 
   const handleSave = async () => {
@@ -163,7 +190,7 @@ export const VoiceRecorder = ({ isOpen, onClose, onSuccess, orderNumber }: Voice
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={beforeClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-center">请录入声纹</DialogTitle>
@@ -266,7 +293,7 @@ export const VoiceRecorder = ({ isOpen, onClose, onSuccess, orderNumber }: Voice
           </div>
 
           <div className="flex justify-between">
-            <Button variant="ghost" onClick={onClose}>
+            <Button variant="ghost" onClick={beforeClose}>
               先不录，返回
             </Button>
           </div>

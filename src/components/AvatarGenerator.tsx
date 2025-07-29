@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Upload, Sparkles, Trash2, Check, User } from "lucide-react";
+import { Upload, Trash2, Check, User, Loader } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -15,38 +15,19 @@ interface AvatarGeneratorProps {
   orderNo: string;
 }
 
-interface GeneratedImage {
-  id: string;
-  url: string;
-  style: 'cartoon' | 'realistic';
-}
-
 export const AvatarGenerator = ({ isOpen, onClose, onSave, orderNo }: AvatarGeneratorProps) => {
   const [selectedGender, setSelectedGender] = useState<'male' | 'female'>('female');
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [originalPhotoUrl, setOriginalPhotoUrl] = useState<string | null>(null);
-  const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>([]);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const { toast } = useToast();
-
-  // Mock generated images for demo
-  const mockGeneratedImages: GeneratedImage[] = [
-    { id: '1', url: '/placeholder1.svg', style: 'cartoon' },
-    { id: '2', url: '/placeholder2.svg', style: 'cartoon' },
-    { id: '3', url: '/placeholder3.svg', style: 'cartoon' },
-    { id: '4', url: '/placeholder4.svg', style: 'cartoon' },
-    { id: '5', url: '/placeholder5.svg', style: 'realistic' },
-    { id: '6', url: '/placeholder6.svg', style: 'realistic' },
-    { id: '7', url: '/placeholder7.svg', style: 'realistic' },
-    { id: '8', url: '/placeholder8.svg', style: 'realistic' },
-  ];
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
 
     if (file) {
+      setIsSaving(true);
       const reader = new FileReader();
       reader.onload = (e) => {
         setUploadedImage(e.target?.result as string);
@@ -60,7 +41,7 @@ export const AvatarGenerator = ({ isOpen, onClose, onSave, orderNo }: AvatarGene
           if (response.data.uploadSuccess && response.data.url) {
             toast({
               title: "图片上传成功",
-              description: "您现在可以生成 AI 头像了",
+              description: "将被系统后台用于生成 AI 头像",
             });
             setOriginalPhotoUrl(response.data.url);
           } else {
@@ -73,6 +54,8 @@ export const AvatarGenerator = ({ isOpen, onClose, onSave, orderNo }: AvatarGene
           description: formatErrorMessage(error),
           variant: "destructive",
         });
+      } finally {
+        setIsSaving(false);
       }
     }
   };
@@ -81,40 +64,15 @@ export const AvatarGenerator = ({ isOpen, onClose, onSave, orderNo }: AvatarGene
     document.getElementById('avatar-upload')?.click();
   };
 
-  const generateAvatars = async () => {
-    if (!uploadedImage) {
-      toast({
-        title: "请先上传图片",
-        description: "需要上传头像图片才能进行AI生成",
-        variant: "destructive",
-      });
-
-      return;
-    }
-
-    setIsGenerating(true);
-
-    // Simulate API call delay
-    setTimeout(() => {
-      setGeneratedImages(mockGeneratedImages);
-      setIsGenerating(false);
-      toast({
-        title: "生成完成",
-        description: "已为您生成8张不同风格的头像",
-      });
-    }, 3000);
-  };
-
   const deleteUploadedImage = () => {
     setUploadedImage(null);
     setOriginalPhotoUrl(null);
-    setGeneratedImages([]);
-    setSelectedImage(null);
+    onSave('', '')
   };
 
   const handleConfirm = () => {
-    if (selectedImage) {
-      onSave(selectedImage, originalPhotoUrl || undefined);
+    if (uploadedImage && originalPhotoUrl) {
+      onSave(originalPhotoUrl, uploadedImage);
       onClose();
       toast({
         title: "头像已保存",
@@ -136,10 +94,10 @@ export const AvatarGenerator = ({ isOpen, onClose, onSave, orderNo }: AvatarGene
         <DialogHeader>
           <DialogTitle className="text-center">上传头像素材</DialogTitle>
         </DialogHeader>
-        
+
         <div className="space-y-6">
-          <div className="bg-muted/50 rounded-lg p-4">
-            <p className="font-medium text-foreground mb-3">请上传符合如下要求的头像：</p>
+          <div className="bg-muted/50 rounded-lg">
+            <p className="font-medium text-foreground mb-3 block">请上传符合如下要求的头像：</p>
             <div className="grid grid-cols-2 gap-2">
               {requirements.map((req, index) => (
                 <div key={index} className="flex items-center gap-2">
@@ -152,7 +110,7 @@ export const AvatarGenerator = ({ isOpen, onClose, onSave, orderNo }: AvatarGene
 
           <div className="space-y-4">
             <div>
-              <Label className="text-sm font-medium mb-3 block">选择性别</Label>
+              <Label className="text-sm font-medium mb-3 block">选择性别：</Label>
               <RadioGroup
                 value={selectedGender}
                 onValueChange={(value) => setSelectedGender(value as 'male' | 'female')}
@@ -209,104 +167,24 @@ export const AvatarGenerator = ({ isOpen, onClose, onSave, orderNo }: AvatarGene
                       className="w-32 h-32 object-cover rounded-lg border mx-auto"
                     />
                   </div>
-
-                  <Button
-                    onClick={generateAvatars}
-                    disabled={isGenerating}
-                    variant="meo"
-                    size="lg"
-                    className="w-full"
-                  >
-                    {isGenerating ? (
-                      <>
-                        <Sparkles className="h-5 w-5 mr-2 animate-spin" />
-                        正在生成中...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="h-5 w-5 mr-2" />
-                        生成
-                      </>
-                    )}
-                  </Button>
                 </div>
               )}
             </div>
 
-            {generatedImages.length > 0 && (
-              <div className="space-y-4">
-                <div className="space-y-3">
-                  <p className="font-medium">卡通风格</p>
-                  <div className="grid grid-cols-4 gap-3">
-                    {generatedImages.filter(img => img.style === 'cartoon').map((image) => (
-                      <div
-                        key={image.id}
-                        className={`relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
-                          selectedImage === image.url
-                            ? 'border-primary shadow-glow scale-105'
-                            : 'border-border hover:border-primary/50'
-                        }`}
-                        onClick={() => setSelectedImage(image.url)}
-                      >
-                        <img
-                          src={image.url}
-                          alt="Generated avatar"
-                          className="w-full aspect-square object-cover"
-                        />
-                        {selectedImage === image.url && (
-                          <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
-                            <div className="bg-primary rounded-full p-1">
-                              <Check className="h-4 w-4 text-primary-foreground" />
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <p className="font-medium">写实风格</p>
-                  <div className="grid grid-cols-4 gap-3">
-                    {generatedImages.filter(img => img.style === 'realistic').map((image) => (
-                      <div
-                        key={image.id}
-                        className={`relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
-                          selectedImage === image.url
-                            ? 'border-primary shadow-glow scale-105'
-                            : 'border-border hover:border-primary/50'
-                        }`}
-                        onClick={() => setSelectedImage(image.url)}
-                      >
-                        <img
-                          src={image.url}
-                          alt="Generated avatar"
-                          className="w-full aspect-square object-cover"
-                        />
-                        {selectedImage === image.url && (
-                          <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
-                            <div className="bg-primary rounded-full p-1">
-                              <Check className="h-4 w-4 text-primary-foreground" />
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {selectedImage && (
-                  <Button
-                    onClick={handleConfirm}
-                    variant="success"
-                    size="lg"
-                    className="w-full"
-                  >
-                    <Check className="h-5 w-5 mr-2" />
-                    确认选择
-                  </Button>
-                )}
-              </div>
+            {uploadedImage && (
+              <Button
+                onClick={handleConfirm}
+                variant="meo"
+                size="lg"
+                disabled={isSaving || !uploadedImage || !originalPhotoUrl}
+                className="w-full"
+              >
+                {isSaving ? (
+                    <>正在保存... <Loader className="ml-2 h-4 w-4 animate-spin" /></>
+                  ) : (
+                    "确认使用此头像"
+                  )}
+              </Button>
             )}
           </div>
 

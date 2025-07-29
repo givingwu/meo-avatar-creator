@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Mic, User, Upload, MessageCircle, ChevronDown, ChevronUp } from "lucide-react";
+import { Mic, User, MessageCircle, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -131,11 +131,11 @@ export const UploadMaterials = ({ onNext, onBack }: UploadMaterialsProps) => {
     }
   };
 
-  const handleAvatarSave = (imageUrl: string, originalPhotoUrl?: string) => {
+  const handleAvatarSave = (avatarUrl: string, originalPhotoUrl: string) => {
     setFormData(prev => ({
       ...prev,
-      avatarUrl: imageUrl,
-      originalPhotoUrl
+      avatarUrl,
+      originalPhotoUrl,
     }));
   };
 
@@ -262,7 +262,7 @@ export const UploadMaterials = ({ onNext, onBack }: UploadMaterialsProps) => {
                 >
                   {formData.avatarUrl ? (
                     <img
-                      src={formData.avatarUrl}
+                      src={formData.originalPhotoUrl}
                       alt="Selected avatar"
                       className="h-12 w-12 rounded-lg object-cover mr-3"
                     />
@@ -286,7 +286,7 @@ export const UploadMaterials = ({ onNext, onBack }: UploadMaterialsProps) => {
             <p className="text-xs text-muted-foreground mb-4 text-center">
               注释：获取的姓名、电话仅为定制过程中沟通使用，不涉及获取个人隐私
             </p>
-            
+
             <div className="space-y-3">
               <Button
                 onClick={handleSubmit}
