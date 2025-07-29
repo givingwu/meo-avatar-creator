@@ -2,7 +2,7 @@
  * 定制信息相关API服务
  */
 import { API_CONFIG } from '@/constants/system.constant';
-import type { BaseResponse } from '@/types/common.type';
+import type { ApiResponse } from '@/types/common.type';
 
 export interface FileUploadResponse {
   code: number;
@@ -13,6 +13,8 @@ export interface FileUploadResponse {
     fileName: string;
     fileSize: number;
     fileType: string;
+    uploadSuccess: boolean;
+    detectionFailureReason?: string;
   };
   requestId: string;
 }
@@ -27,8 +29,6 @@ export interface CustomInfoDTO {
   avatarUrl?: string;
   originalPhotoUrl?: string;
 }
-
-export interface ApiResponse<T> extends BaseResponse<T> {}
 
 const { BASE_URL } = API_CONFIG;
 

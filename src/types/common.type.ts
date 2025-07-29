@@ -3,11 +3,11 @@
  */
 
 // 基础响应类型
-export interface BaseResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   code: number;
   message: string;
   data: T;
-  requestId: string;
+  requestId?: string;
 }
 
 // 分页参数类型
