@@ -9,7 +9,7 @@ interface ReadingNoticeProps {
 }
 
 export const ReadingNotice = ({ onNext, onBack }: ReadingNoticeProps) => {
-  const [acknowledged, setAcknowledged] = useState(false);
+  const [acknowledged, setAcknowledged] = useState(true);
 
   const noticeContent = `
 在使用 MEO 自主定制服务前，请仔细阅读以下重要信息：

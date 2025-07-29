@@ -11,6 +11,9 @@ const Index = () => {
   const [currentStep, setCurrentStep] = useState<Step>('welcome');
 
   const handleNext = useCallback(() => {
+    // 切换 step 后滚动到顶部
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
     switch (currentStep) {
       case 'welcome':
         setCurrentStep('reading');
