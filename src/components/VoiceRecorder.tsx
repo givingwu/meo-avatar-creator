@@ -51,7 +51,7 @@ export const VoiceRecorder = ({ isOpen, onClose, onSuccess, orderNumber }: Voice
           type: 'audio/wav',
           lastModified: Date.now()
         });
-        console.log('AudioFIle', audioFile)
+
         setAudioFile(audioFile);
         stream.getTracks().forEach(track => track.stop());
       };
@@ -133,12 +133,16 @@ export const VoiceRecorder = ({ isOpen, onClose, onSuccess, orderNumber }: Voice
         const response = await uploadAudio(audioFile, orderNumber);
 
         if (isSuccessResponse(response)) {
-          onSuccess(response.data.url);
-          onClose();
-          toast({
-            title: "上传成功",
-            description: "音频文件已上传",
-          });
+          if (response.data.uploadSuccess) {
+            onSuccess(response.data.url);
+            onClose();
+            toast({
+              title: "上传成功",
+              description: "音频文件已上传",
+            });
+          } else {
+            throw new Error(response.data.detectionFailureReason);
+          }
         }
       } catch (error) {
         toast({

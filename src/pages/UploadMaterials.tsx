@@ -20,7 +20,6 @@ interface FormData {
   name: string;
   phone: string;
   personality: string;
-  voiceBlob: Blob | null;
   avatarUrl: string | null;
   audioUrl?: string;
   originalPhotoUrl?: string;
@@ -43,12 +42,11 @@ const validateForm = (formData: FormData) => {
   if (!validatePersonalityDesc(formData.personality)) {
     errors.push("性格描述长度不符合要求（10-200字）");
   }
-  // 将验证voiceBlob改为验证audioUrl
   if (!formData.audioUrl) {
-    errors.push("声音素材");
+    errors.push("声音素材不能为空");
   }
   if (!formData.avatarUrl) {
-    errors.push("头像素材");
+    errors.push("头像素材不能为空");
   }
 
   return errors;
@@ -60,9 +58,7 @@ export const UploadMaterials = ({ onNext, onBack }: UploadMaterialsProps) => {
     name: '',
     phone: '',
     personality: '',
-    voiceBlob: null,
     avatarUrl: null,
-    // 保留audioUrl但不再需要voiceBlob
     audioUrl: undefined
   });
 
@@ -82,8 +78,7 @@ export const UploadMaterials = ({ onNext, onBack }: UploadMaterialsProps) => {
   const handleVoiceSuccess = (audioUrl: string) => {
     setFormData(prev => ({
       ...prev,
-      audioUrl,
-      voiceBlob: null // 清除不再需要的blob
+      audioUrl
     }));
   };
 
@@ -243,16 +238,16 @@ export const UploadMaterials = ({ onNext, onBack }: UploadMaterialsProps) => {
                 <Label className="text-sm font-medium">声音素材*</Label>
                 <Button
                   onClick={() => setShowVoiceRecorder(true)}
-                  variant={formData.voiceBlob ? "success" : "outline"}
+                  variant={formData.audioUrl ? "success" : "outline"}
                   className="w-full justify-start h-auto p-4"
                 >
                   <Mic className="h-5 w-5 mr-3" />
                   <div className="text-left">
                     <p className="font-medium">
-                      {formData.voiceBlob ? "已录制声音素材" : "点击录制"}
+                      {formData.audioUrl ? "已录制声音素材" : "点击录制"}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {formData.voiceBlob ? "点击重新录制" : "录制您的专属声纹"}
+                      {formData.audioUrl ? "点击重新录制" : "录制您的专属声纹"}
                     </p>
                   </div>
                 </Button>
